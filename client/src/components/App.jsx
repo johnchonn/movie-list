@@ -1,81 +1,71 @@
-import React, { Component } from 'react';
-import Movies from './Movies.jsx';
-import movies from './MovieListData.jsx';
+import React, { useState, useEffect } from 'react';
+import MovieItem from './MovieItem.jsx';
+import MovieList from './MovieList.jsx';
 import SearchBar from './SearchBar.jsx';
-import AddMovie from './AddMovie.jsx';
+import axios from 'axios';
 
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      movies: [],
-      query: null,
-    };
 
-    this.updateQuery = this.updateQuery.bind(this);
-    this.filterMovies = this.filterMovies.bind(this);
-    this.addMovie = this.addMovie.bind(this);
-    this.setWatched = this.setWatched.bind(this);
-  };
+const App = () => {
 
-  addMovie(movie) {
-    const movie = {title};
-    const id = this.state.movies.length + 1;
-    movie.id = id;
-    movie.watched = false;
-    const movies = this.state.movies.slice(0);
-    movies.push(movie)
-    this.setState({movies});
+  const [movies, setMovies] = useState([]);
+  const [query, setQuery] = useState('');
+
+  const updateQuery = (query) => {
+    setQuery(query);
   }
 
-  componentDidMount() {
-    this.setState({movies: [
-      {title: 'elf', watched: true, id: 1},
-      {title: 'Batman', watched: false, id: 3}
-      ]
+  useEffect(() => {
+    // console.log(filterMovies());
+    setMovies(filterMovies());
+  }, [query])
+
+  const getData = (cb) => {
+    fetch('http://localhost:3000/api/movies')
+    .then((response) => {
+      return response.json();
+
+    }).then((data) => {
+      cb(data);
+    });
+  }
+
+  const handleSearch = (value) => {
+    axios.get('http://localhost:3000/api/search', {
+      searchValue: value
     })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+    .then(function () {
+      // always executed
+    });
   }
 
-  setWatched(id) {
-    for (let i = 0; i < this.state.movies.length; i++) {
-      const currentMovie = this.state.movies[i];
-      if (currentMovie.id === id) {
-        currentMovie.watched = !currentMovie.watched;
-        const movies = this.state.movies.slice(0);
-        movies[i] = currentMovie;
-        this.setState({movies});
-      }
+  useEffect(() => {
+    getData((data) => {setMovies(data)});
+  }, []);
+
+
+  const filterMovies = () => {
+    if (query.length > 0) {
+      return movies.filter((movie) => {
+          return movie.title.toLowerCase().includes(query);
+      });
+    } else {
+      return movies;
     }
+    // return movies;
   }
 
-  updateQuery(query) {
-    this.setState({query});
-  }
-
-filterMovies() {
-  const { query, movies } = this.state;
-  if (query) {
-    return movies.filter((movie) => {
-      if (movie.title.toLowerCase().includes(query.toLowerCase())) {
-        return true;
-      }
-      return false;
-    })
-  }
-  return movies;
-}
-
-  render() {
-    const { movies } = this.state;
-    return (
+  return (
     <div>
-      <h1>Movie List</h1>
-      <AddMovie add={this.addMovie} />
-      <SearchBar updateQuery={this.updateQuery}/>
-      <Movies setWatched={this.setWatched} movies={this.filterMovies(movies)} />
+      <SearchBar updateQuery={updateQuery} handleSearch={handleSearch}/>
+      <MovieList movieData={movies} />
     </div>
-    )
-  }
+  )
 }
 
 export default App;

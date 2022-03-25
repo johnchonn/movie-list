@@ -1,38 +1,28 @@
+import React, { useState, useEffect } from 'react';
 
-import React {Component} from 'react';
 
-class SearchBar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      search: '',
-    }
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+const SearchBar = ({ updateQuery, handleSearch }) => {
+
+  const [searchValue, setSearchValue] = useState('');
+
+  const handleChange = (event) => {
+    setSearchValue(event.target.value);
   }
 
-  handleChange(e) {
-    this.setState({[e.target.name]: e.target.value});
+  const handleClick = (event) => {
+    event.preventDefault();
+    updateQuery(searchValue);
   }
 
-  handleSubmit(e) {
-    e.preventDefault();
-    this.props.updateQuery(this.state.search);
-    this.setState({search: ''});
-  }
-
-  render() {
-    return (
-    <form>
-      <input
-      onChange={this.handleChange}
-      value={this.state.searchState}
-      type='type'
-      />
-      <button onClick={this.handleSubmit}>Search</button>
-    </form>
-    );
-  }
+  return (
+    <form onSubmit={handleClick}>
+      <label>
+        Search
+      <input onChange={handleChange} type="text" placeholder="Search..." value={searchValue} />
+      <button>Go!</button>
+      </label>
+      </form>
+  )
 }
 
 export default SearchBar;

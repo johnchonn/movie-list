@@ -1,5 +1,5 @@
 import React from 'react';
-var movies = [
+var movieData = [
   {title: 'Mean Girls'},
   {title: 'Hackers'},
   {title: 'The Grey'},
@@ -7,4 +7,4 @@ var movies = [
   {title: 'Ex Machina'},
 ];
 
-export default movies;
+export default movieData;
